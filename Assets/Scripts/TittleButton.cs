@@ -2,12 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class TittleButton : MonoBehaviour
 {
+
+    private mind_wave mind;
+
     // Tela do Mindwave
     public GameObject mind_obj;
     private bool mind_control = false;
+    public Text mind_text;
 
     // Tela das configurações
     public GameObject config_obj;
@@ -20,13 +25,31 @@ public class TittleButton : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        mind = GameObject.FindWithTag("Mind").GetComponent<mind_wave>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if(Input.GetKeyDown("r") && mind_control){
+            mind.teste = true;
+        }
+
+        if(mind_control && !mind.teste){
+            mind_text.text = "Aperte o botão para se conectar ao Mind Wave!";
+        }
+
+        if(mind.teste)
+        {
+            if(mind.conectado)
+            {
+                mind_text.text = "Conectado!!";
+            }
+            else if(!mind.conectado)
+            {
+                mind_text.text = "Não foi possível conectar-se ao Mind Wave\nTente novamente!";
+            }
+        }
     }
 
     public void next_scene()

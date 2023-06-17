@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class ui_controller : MonoBehaviour
 {
-    public GameObject Image;
     public player_controller var;
 
     // Variáveis de pontuação
@@ -21,7 +20,7 @@ public class ui_controller : MonoBehaviour
     // Variáveis do Mindwave
     public Text attencion;
     public Text meditation;
-    public mind_wave mw_var;
+    private mind_wave mw_var;
     private bool mind_on = false;
 
     // Start is called before the first frame update
@@ -48,7 +47,7 @@ public class ui_controller : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.U))
         {
-            mw_var = GameObject.Find("ui_controller").GetComponent<mind_wave>();
+            mw_var = GameObject.FindWithTag("Mind").GetComponent<mind_wave>();
             mind_on = true;
         }
 
@@ -74,11 +73,6 @@ public class ui_controller : MonoBehaviour
             attencion.text = mw_var.Attention.ToString();
             meditation.text = mw_var.Meditation.ToString();
         }
-    }
-
-    public void show_tela()
-    {
-        Image.SetActive(true);
     }
 
     public void add_coin()

@@ -16,8 +16,9 @@ public class mind_wave : MonoBehaviour
     public static float sLowAlpha, sHighAlpha, sLowBeta, sHighBeta, sLowGamma, sHighGamma, sEEGValue, sBlinkStrength;
     private int m_EEGValue;
     private int m_BlinkStrength;
-    private bool teste = false;
+    public bool teste = false;
     private bool control = false;
+    public bool conectado;
     void Start()
     {
     }
@@ -28,10 +29,6 @@ public class mind_wave : MonoBehaviour
             MindwaveManager.Instance.Controller.OnUpdateMindwaveData += OnUpdateMindwaveData;
             Connect();
             control = true;
-        }
-
-        if(Input.GetKeyDown(KeyCode.M)){
-            teste = true;
         }
         
         sStatus = Status = m_MindwaveData.status;
@@ -67,10 +64,12 @@ public class mind_wave : MonoBehaviour
         if (m_MindwaveData.eegPower.delta > 0)
         {
             TMPText.text = "Connected";
+            conectado = true;
         }
         if (MindwaveController.isTimeout)
         {
             TMPText.text = "Can't connect";
+            conectado = false;
         }
     }
     public void RetryConnection()
@@ -78,5 +77,10 @@ public class mind_wave : MonoBehaviour
         MindwaveManager.Instance.Controller.Connect();
         MindwaveController.isTimeout = false;
         TMPText.text = "Retry Connection";
+    }
+
+    private void Awake()
+    {
+        DontDestroyOnLoad(this);
     }
 }

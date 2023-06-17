@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class player_controller : MonoBehaviour {
 
@@ -62,10 +63,6 @@ public class player_controller : MonoBehaviour {
                 exec_jump = false;
                 anim_player.SetBool("jump",false);
             }
-            
-            if(Input.GetKeyDown(KeyCode.R)){
-                ui_control.show_tela();
-            }
         }
 
         // Aplica a gravidade ao vetor de movimento
@@ -90,6 +87,7 @@ public class player_controller : MonoBehaviour {
             player_dead = true;
             vida_remove = true;
             anim_player.SetBool("death",true);
+            Invoke("game_over",5.0f);
         }
         else if(Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward + new Vector3(0,1f,0)), out hit, raio_colisao, layer) && !player_dead)
         {
@@ -124,5 +122,9 @@ public class player_controller : MonoBehaviour {
         jumpForce = 0;
         player_dead = true;
         anim_player.SetBool("finish",true);
+    }
+
+    public void game_over(){
+        SceneManager.LoadScene("Gameover");
     }
 }
