@@ -16,19 +16,17 @@ public class mind_wave : MonoBehaviour
     public static float sLowAlpha, sHighAlpha, sLowBeta, sHighBeta, sLowGamma, sHighGamma, sEEGValue, sBlinkStrength;
     private int m_EEGValue;
     private int m_BlinkStrength;
-    public bool teste = false;
-    private bool control = false;
+    public bool control = false;
     public bool conectado;
     void Start()
     {
     }
     void Update()
     {
-        if(teste && !control)
+        if(control)
         {
             MindwaveManager.Instance.Controller.OnUpdateMindwaveData += OnUpdateMindwaveData;
             Connect();
-            control = true;
         }
         
         sStatus = Status = m_MindwaveData.status;
@@ -65,11 +63,19 @@ public class mind_wave : MonoBehaviour
         {
             TMPText.text = "Connected";
             conectado = true;
+            control = true;
         }
+        else
+        {
+            conectado = false;
+            control = false;
+        }
+
         if (MindwaveController.isTimeout)
         {
             TMPText.text = "Can't connect";
             conectado = false;
+            control = false;
         }
     }
     public void RetryConnection()

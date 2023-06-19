@@ -9,10 +9,14 @@ public class TittleButton : MonoBehaviour
 
     private mind_wave mind;
 
+    public InputField name_player;
+    public bool on_end_edit = false;
+
     // Tela do Mindwave
     public GameObject mind_obj;
     private bool mind_control = false;
     public Text mind_text;
+    public GameObject mind_on;
 
     // Tela das configurações
     public GameObject config_obj;
@@ -26,20 +30,17 @@ public class TittleButton : MonoBehaviour
     void Start()
     {
         mind = GameObject.FindWithTag("Mind").GetComponent<mind_wave>();
+        name_player.onEndEdit.AddListener(OnEndEdit);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown("r") && mind_control){
-            mind.teste = true;
-        }
-
-        if(mind_control && !mind.teste){
+        if(mind_control && !mind.control){
             mind_text.text = "Aperte o botão para se conectar ao Mind Wave!";
         }
 
-        if(mind.teste)
+        if(mind.control)
         {
             if(mind.conectado)
             {
@@ -97,5 +98,18 @@ public class TittleButton : MonoBehaviour
             instr_obj.SetActive(false);
             instr_control = false;
         }
+    }
+
+    public void mind_connect()
+    {
+        if(mind_control)
+        {
+            mind.control = true;
+        }
+    }
+
+    private void OnEndEdit(string text)
+    {
+        on_end_edit = true;
     }
 }
