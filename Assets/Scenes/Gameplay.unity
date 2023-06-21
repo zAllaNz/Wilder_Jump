@@ -678,6 +678,8 @@ MonoBehaviour:
   difficultyIncreaseRate: 10
   initialSpawnDelay: 3
   spawnDelayReduction: 0.2
+  coin_prefab: {fileID: 6353022555557158442, guid: bdc3fce9f8c750b4793c0004c94029e2, type: 3}
+  spawn_coin: ffffffff0000000001000000
 --- !u!4 &1604992953
 Transform:
   m_ObjectHideFlags: 0
@@ -831,6 +833,9 @@ MonoBehaviour:
   vida: 3
   vida_add: 0
   vida_remove: 0
+  tempo: 0
+  dificuldade: 1
+  troca_dificuldade: 0
 --- !u!4 &1816465112 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400002, guid: 44a7cf9af2fa0c1488fc4106b715c6f5, type: 3}

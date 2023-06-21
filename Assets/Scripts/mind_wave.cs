@@ -16,6 +16,7 @@ public class mind_wave : MonoBehaviour
     public static float sLowAlpha, sHighAlpha, sLowBeta, sHighBeta, sLowGamma, sHighGamma, sEEGValue, sBlinkStrength;
     private int m_EEGValue;
     private int m_BlinkStrength;
+    public static int blink = 0;
     public bool control = false;
     public bool conectado;
     void Start()
@@ -27,6 +28,10 @@ public class mind_wave : MonoBehaviour
         {
             MindwaveManager.Instance.Controller.OnUpdateMindwaveData += OnUpdateMindwaveData;
             Connect();
+        }
+        if(BlinkStrength != 0)
+        {
+            blink++;
         }
         
         sStatus = Status = m_MindwaveData.status;

@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class player_controller : MonoBehaviour {
 
     // Variáveis publicas
-    public float vel_move = 6f;
+    public float vel_move = 3.5f;
     public float jumpForce = 8f;
     public float gravity = 20f;
     //padrão 5f
@@ -28,14 +28,25 @@ public class player_controller : MonoBehaviour {
     public int vida;
     public bool vida_add = false;
     public bool vida_remove = false;
+    public float tempo;
+    private int coins = 0; 
 
     // Controle da Interface de Usuário
     private ui_controller ui_control;
+    private mind_wave mind;
+    
+    // Variáveis de controle de tempo e dificuldade
+    private float intervalo = 10f;
+    private float time_atual = 0f;
+    public int dificuldade = 1;
+    public bool troca_dificuldade = false;
+    private float vel_nova = 5f;
 
     void Start () {
         controller = GetComponent<CharacterController>();
         anim_player = GetComponent<Animator>();
         ui_control = FindObjectOfType<ui_controller>();
+        mind = GameObject.FindWithTag("Mind").GetComponent<mind_wave>();
         vida = 3;
     }
 
@@ -65,13 +76,38 @@ public class player_controller : MonoBehaviour {
             }
         }
 
+        // Controle da velocidade horizontal e vertical de acordo com os dados do mind wave
+        if(time_atual >= intervalo)
+        {
+            // Atualizando a velocidade vertical de acordo com os valores do mind wave
+            int attention = Mathf.FloorToInt(mind.Attention / 10f);
+            vel_nova = 5f + attention * 0.5f;
+
+            // Atualizando a velocidade vertical de acordo com os valores do mind wave
+            int meditation = Mathf.FloorToInt(mind.Meditation / 10f);
+            vel_move = 3.5f + meditation * 0.25f;
+
+            // Alterando a dificuldade do jogo de acordo com os valores do mind wave
+            int soma = Mathf.CeilToInt(((mind.Meditation + mind.Attention)/33)/2);
+            if(soma != 0 && dificuldade != soma)
+            {
+                dificuldade = soma;
+                troca_dificuldade = true;
+            }
+
+            // Resetar o tempo para entrar na condicional novamente
+            time_atual = 0f;
+        }
+
         // Aplica a gravidade ao vetor de movimento
         moveDirection.y -= gravity * Time.deltaTime;
         moveDirection.z = vel;
 
         // Move o jogador com base no vetor de movimento
         controller.Move(moveDirection * Time.deltaTime);
-
+        vel = Mathf.Lerp(vel, vel_nova, 0.1f);
+        tempo = Time.time;
+        time_atual += Time.deltaTime;
         colisao();
     }
 
@@ -102,7 +138,12 @@ public class player_controller : MonoBehaviour {
         if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward + new Vector3(0,1f,0)), out coin, raio_colisao*2, layer_coletavel))
         {
             ui_control.add_coin();
-            vida_add = true;
+            coins++;
+            if(coins >= 50)
+            {
+                vida_add = true;
+                coins = 0;
+            }
             Destroy(coin.transform.gameObject);
         }
     }

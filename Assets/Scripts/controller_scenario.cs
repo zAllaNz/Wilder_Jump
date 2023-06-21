@@ -42,6 +42,10 @@ public class controller_scenario : MonoBehaviour
     private int obstacles_number;
     private int obstacles_x;
 
+    // Criando as moedas
+    public GameObject coin_prefab;
+    public int[] spawn_coin;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -129,7 +133,7 @@ public class controller_scenario : MonoBehaviour
         switch(ambient)
         {
             case "florest":
-                if(ui.distancia >= 100 && distance_scenario >= 25)
+                if(ui.distancia >= 1000 && distance_scenario >= 25)
                 {
                     if(index_scenario == 2)
                     {   
@@ -147,6 +151,41 @@ public class controller_scenario : MonoBehaviour
                     }
                 }
             break;
+
+            case "city":
+                if(ui.distancia >= 2200 && distance_scenario >= 25)
+                {
+                    Debug.Log("aq");
+                }
+                ambient = "outro";
+            break;
+        }
+
+        // Quando a dificuldade do jogo for alterada, mude o tempo de spawn dos obstaculos
+        if(var.troca_dificuldade)
+        {
+            if(var.dificuldade == 1)
+            {
+                CancelInvoke("SpawnObstacle");
+                currentSpawnDelay = 1f;
+                // Inicia novamente as chamadas repetidas com o novo tempo entre instanciamentos
+                InvokeRepeating("SpawnObstacle", 0f, currentSpawnDelay);
+            }
+            else if(var.dificuldade == 2)
+            {
+                CancelInvoke("SpawnObstacle");
+                currentSpawnDelay = 0.75f;
+                // Inicia novamente as chamadas repetidas com o novo tempo entre instanciamentos
+                InvokeRepeating("SpawnObstacle", 0f, currentSpawnDelay);
+            }
+            else
+            {
+                CancelInvoke("SpawnObstacle");
+                currentSpawnDelay = 0.5f;
+                // Inicia novamente as chamadas repetidas com o novo tempo entre instanciamentos
+                InvokeRepeating("SpawnObstacle", 0f, currentSpawnDelay);
+            }
+            var.troca_dificuldade = false;
         }
     }
 
@@ -165,7 +204,7 @@ public class controller_scenario : MonoBehaviour
     }
 
     void SpawnObstacle() {
-        obstacles_number = Random.Range(1,1);
+        obstacles_number = Random.Range(1,3);
         obstacles_x = Random.Range(spawnPoints[0],spawnPoints[2]);
         // Verifica se existem pontos de spawn e obstáculos disponíveis
         if (spawnPoints.Length > 0 && obstacles.Length > 0 && obstacles_number == 1) {
@@ -180,9 +219,6 @@ public class controller_scenario : MonoBehaviour
         }
         else if(spawnPoints.Length > 0 && obstacles.Length > 0 && obstacles_number == 2)
         {
-            if(obstacles_x == 2){
-                obstacles_x--;
-            }
             for(int i = 0; i < 2; i++)
             {
                 GameObject selectedObstacle = obstacles[Random.Range(0, obstacles.Length)];
@@ -195,26 +231,31 @@ public class controller_scenario : MonoBehaviour
                 obstacles_x++;
             }
         }
-        obstacles_z += 15;
-    }
 
-    void IncreaseDifficulty() {
-        // Reduz o tempo entre o instanciamento de obstáculos para aumentar a dificuldade
-        currentSpawnDelay -= spawnDelayReduction;
+        // Criando as moedas
+        int qntd = Random.Range(0,5);
+        float coin_z = obstacles_z+2;
+        int coin_x = Random.Range(spawn_coin[0],spawn_coin[2]);
+        for(int i = 0; i <= qntd; i++)
+        {
+            // Seleciona um ponto de spawn aleatoriamente
+            Transform selected_coin = coin_prefab.GetComponent<Transform>();
 
-        // Verifica se o tempo entre o instanciamento de obstáculos é menor que 0.5f (mínimo)
-        if (currentSpawnDelay < 0.5f) {
-            currentSpawnDelay = 0.5f;
+            // Instancia o obstáculo no ponto de spawn selecionado
+            Instantiate(selected_coin, new Vector3(coin_x, selected_coin.position.y, coin_z), selected_coin.rotation);
+            coin_z += 1.5f;
         }
-    }
 
-    // Chamado quando o jogador atinge um marco de dificuldade
-    public void OnDifficultyIncrease() {
-        // Aumenta a dificuldade chamando o método de aumento da dificuldade
-        IncreaseDifficulty();
-        // Cancela as chamadas repetidas do método de instanciar obstáculos
-        CancelInvoke("SpawnObstacle");
-        // Inicia novamente as chamadas repetidas com o novo tempo entre instanciamentos
-        InvokeRepeating("SpawnObstacle", 0f, currentSpawnDelay);
+        if(var.dificuldade == 1){
+            obstacles_z += 15;
+        }
+        else if(var.dificuldade == 2)
+        {
+            obstacles_z += 12;
+        }
+        else
+        {
+            obstacles_z += 9;
+        }
     }
 }

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -12,13 +11,15 @@ public class player_data : MonoBehaviour
     private TittleButton tittle;
     private string name;
 
-    // Acessando as variáveis do script do mind wave
+    // Acessando as variï¿½veis do script do mind wave
     private mind_wave mind;
     public string cena_gameplay;
-    private bool cena_certa = false;
-
+    public bool cena_certa = false;
     public string file_name = @"";
     private string cena_atual;
+    private string teste;
+    private player_controller player;
+    private ui_controller ui;
 
 
     // Start is called before the first frame update
@@ -26,16 +27,13 @@ public class player_data : MonoBehaviour
     {
         tittle = GameObject.Find("TitleScreen").GetComponent<TittleButton>();
         mind = GameObject.FindWithTag("Mind").GetComponent<mind_wave>();
+        cena_atual = SceneManager.GetActiveScene().name;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!cena_certa)
-        {
-            cena_atual = SceneManager.GetActiveScene().name;
-        }
-
         if (tittle.on_end_edit)
         {
             name = tittle.name_player.text;
@@ -55,37 +53,71 @@ public class player_data : MonoBehaviour
         DontDestroyOnLoad(this);
     }
 
-    // Configurando o diretório e o nome do arquivo
+    // Configurando o diretï¿½rio e o nome do arquivo
     public string Create_File()
     {
-        file_name += @"C:\Users\USER\Downloads\Wilder_Jump\Data\" + name.ToString() + ".csv";
+        file_name += @"E:\C#\Wilder_Jump\Data\" + name.ToString() + ".csv";
         string file = Headers(file_name);
         return file;
     }
     public string Headers(string FileName)
     {
         string file = FileName;
-        string[] HeaderText = {"Atencion Level, Meditation Level, Blink, Life, Distance, Speed"};
+        string[] HeaderText = {"Atencion Level, Meditation Level, Blink, Life, Distance, Speed, Time played, Difficulty"};
         File.WriteAllLines(file, HeaderText);
         return file;
     }
 
     IEnumerator MakeData(string file)
     {
-        while (true)
+        while(cena_atual == cena_gameplay)
         {
             yield return new WaitForSeconds(1);
             if (Time.timeScale != 0)
             {
                 float attention = mind_wave.sAttention;
                 float meditation = mind_wave.sMeditation;
-                DataRecord(file, attention, meditation);
+                int blink = mind_wave.blink;
+                float life = player.vida;
+                float distance = ui.distancia;
+                float speed = player.vel;
+                float time = player.tempo;
+                int difficulty = player.dificuldade;
+                DataRecord(file, attention, meditation, blink, life, distance, speed, time, difficulty);
             }
         }
     }
-    public void DataRecord(string file, float AT, float ML)
+    public void DataRecord(string file, float AT, float ML, int BK, float LF, float DS, float SP, float TM, int DF)
     {
-        string DataForWrite = Convert.ToString(AT) + "," + Convert.ToString(ML) + "\n";
+        DS = Mathf.FloorToInt(DS);
+        TM = Mathf.FloorToInt(TM);
+        string DC = "easy";
+        
+        if(DF == 1)
+        {
+            DC = "easy";
+        }
+        else if(DF == 2)
+        {
+            DC = "normal";
+        }
+        else
+        {
+            DC = "hard";
+        }
+
+        string DataForWrite = Convert.ToString(AT) + "," + Convert.ToString(ML) + "," + Convert.ToString(BK) + "," + Convert.ToString(LF) + 
+                        "," + Convert.ToString(DS) + "," + Convert.ToString(SP) + "," + Convert.ToString(TM) + "," + DC + "\n";
         File.AppendAllText(file, DataForWrite);
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        cena_atual = scene.name;
+        if(cena_atual == cena_gameplay && !cena_certa)
+        {
+            player = GameObject.Find("Player").GetComponent<player_controller>();
+            ui = GameObject.Find("ui_controller").GetComponent<ui_controller>();
+        }
     }
 }
